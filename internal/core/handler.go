@@ -41,23 +41,19 @@ func (h *handler) Handle(update tgbotapi.Update) tgbotapi.MessageConfig {
 func (h *handler) handleCommand(update tgbotapi.Update) tgbotapi.MessageConfig {
 	commandHandler := command.CreateCommandHandler(h.commandResolver, h.commandStrategyResolver)
 	commandModel, err := commandHandler.Handle(update)
-	msg := commandModel.Msg
 	if err != nil {
-		msg.Text = err.Error()
-		return msg
+		return tgbotapi.NewMessage(update.Message.Chat.ID, err.Error())
 	}
 
-	return msg
+	return commandModel.Msg
 }
 
 func (h *handler) handleTextMessage(update tgbotapi.Update) tgbotapi.MessageConfig {
 	textHandler := text.CreateTextHandler(h.openAIClient)
 	responseModel, err := textHandler.Handle(update)
-	msg := responseModel.Msg
 	if err != nil {
-		msg.Text = err.Error()
-		return msg
+		return tgbotapi.NewMessage(update.Message.Chat.ID, err.Error())
 	}
 
-	return msg
+	return responseModel.Msg
 }
