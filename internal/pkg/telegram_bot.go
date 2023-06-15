@@ -1,4 +1,4 @@
-package telegram_bot
+package pkg
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -6,17 +6,17 @@ import (
 
 var bot *tgbotapi.BotAPI
 
-func ResolveBot() (*tgbotapi.BotAPI, error) {
+func ResolveBot(telegram Telegram) (*tgbotapi.BotAPI, error) {
 	if bot != nil {
 		bot.Debug = true
 		return bot, nil
 	}
 
-	bot, err := tgbotapi.NewBotAPI("6161208907:AAFPg5vchq52ySjfn0etSvjWyU-Ji4ZjT6w")
-	bot.Debug = true
+	telegramBot, err := tgbotapi.NewBotAPI(telegram.Token)
+	telegramBot.Debug = true
 	if err != nil {
 		return nil, err
 	}
 
-	return bot, nil
+	return telegramBot, nil
 }

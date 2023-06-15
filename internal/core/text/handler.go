@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/sashabaranov/go-openai"
 	"helper_openai_bot/internal/model"
-	openai_client "helper_openai_bot/internal/pkg/openai"
 )
 
 type TextHandler interface {
@@ -16,8 +15,7 @@ type textHandler struct {
 	client *openai.Client
 }
 
-func CreateTextHandler() TextHandler {
-	client := openai_client.ResolveClient()
+func CreateTextHandler(client *openai.Client) TextHandler {
 	return &textHandler{client}
 }
 

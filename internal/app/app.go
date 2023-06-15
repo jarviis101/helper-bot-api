@@ -5,7 +5,7 @@ import (
 	"helper_openai_bot/internal/core"
 	"helper_openai_bot/internal/core/command/service"
 	"helper_openai_bot/internal/core/command/strategy"
-	"helper_openai_bot/internal/pkg/telegram_bot"
+	"helper_openai_bot/internal/pkg"
 	"log"
 )
 
@@ -26,7 +26,11 @@ func CreateApplication() Application {
 }
 
 func (app *application) Run() {
-	bot, err := telegram_bot.ResolveBot()
+	config, err := pkg.ResolveConfig()
+	if err != nil {
+		log.Println(err.Error())
+	}
+	bot, err := pkg.ResolveBot(config.Telegram)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -34,11 +38,14 @@ func (app *application) Run() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = timeout
 
+	openAIClient := pkg.ResolveClient(config.OpenAI)
+
 	startHandler := strategy.CreateStartHandler()
 	donateHandler := strategy.CreateDonateHandler()
 	commandStrategyResolver := service.CreateCommandStrategyResolver([]strategy.CommandHandler{startHandler, donateHandler})
 	commandResolver := service.CreateCommandResolver()
-	handler := core.CreateHandler(commandStrategyResolver, commandResolver)
+
+	handler := core.CreateHandler(commandStrategyResolver, commandResolver, openAIClient)
 
 	for update := range bot.GetUpdatesChan(u) {
 		if update.Message == nil {
