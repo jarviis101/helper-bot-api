@@ -1,9 +1,11 @@
 package model
 
+import tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+
 type CommandResponse struct {
-	Message string
+	Msg tgbotapi.MessageConfig
 }
 
 type TextResponse struct {
-	Message string
+	Msg tgbotapi.MessageConfig
 }

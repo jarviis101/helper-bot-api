@@ -57,7 +57,7 @@ func (app *application) Run() {
 	}
 }
 
-func (app *application) sendMessage(bot *tgbotapi.BotAPI, msg *tgbotapi.MessageConfig) {
+func (app *application) sendMessage(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig) {
 	if maintenance {
 		msg.Text = "Bot in maintenance mode"
 	}

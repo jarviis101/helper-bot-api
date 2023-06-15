@@ -9,7 +9,7 @@ import (
 )
 
 type Handler interface {
-	Handle(update tgbotapi.Update) *tgbotapi.MessageConfig
+	Handle(update tgbotapi.Update) tgbotapi.MessageConfig
 }
 
 type handler struct {
@@ -30,36 +30,34 @@ func CreateHandler(
 	}
 }
 
-func (h *handler) Handle(update tgbotapi.Update) *tgbotapi.MessageConfig {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-
+func (h *handler) Handle(update tgbotapi.Update) tgbotapi.MessageConfig {
 	if update.Message.IsCommand() {
-		return h.handleCommand(&msg, update.Message.Text)
+		return h.handleCommand(update)
 	}
 
-	return h.handleTextMessage(&msg, update.Message.Text)
+	return h.handleTextMessage(update)
 }
 
-func (h *handler) handleCommand(msg *tgbotapi.MessageConfig, clientCommand string) *tgbotapi.MessageConfig {
+func (h *handler) handleCommand(update tgbotapi.Update) tgbotapi.MessageConfig {
 	commandHandler := command.CreateCommandHandler(h.commandResolver, h.commandStrategyResolver)
-	commandModel, err := commandHandler.Handle(clientCommand)
+	commandModel, err := commandHandler.Handle(update)
+	msg := commandModel.Msg
 	if err != nil {
 		msg.Text = err.Error()
 		return msg
 	}
 
-	msg.Text = commandModel.Message
 	return msg
 }
 
-func (h *handler) handleTextMessage(msg *tgbotapi.MessageConfig, clientMessage string) *tgbotapi.MessageConfig {
+func (h *handler) handleTextMessage(update tgbotapi.Update) tgbotapi.MessageConfig {
 	textHandler := text.CreateTextHandler(h.openAIClient)
-	responseModel, err := textHandler.Handle(clientMessage)
+	responseModel, err := textHandler.Handle(update)
+	msg := responseModel.Msg
 	if err != nil {
 		msg.Text = err.Error()
 		return msg
 	}
 
-	msg.Text = responseModel.Message
 	return msg
 }

@@ -3,12 +3,13 @@ package text
 import (
 	"context"
 	"fmt"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sashabaranov/go-openai"
 	"helper_openai_bot/internal/model"
 )
 
 type TextHandler interface {
-	Handle(c string) (*model.TextResponse, error)
+	Handle(update tgbotapi.Update) (*model.TextResponse, error)
 }
 
 type textHandler struct {
@@ -19,13 +20,14 @@ func CreateTextHandler(client *openai.Client) TextHandler {
 	return &textHandler{client}
 }
 
-func (t *textHandler) Handle(message string) (*model.TextResponse, error) {
-	responseMessage, err := t.handleText(message)
+func (t *textHandler) Handle(update tgbotapi.Update) (*model.TextResponse, error) {
+	responseMessage, err := t.handleText(update.Message.Text)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.TextResponse{Message: responseMessage}, nil
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, responseMessage)
+	return &model.TextResponse{Msg: msg}, nil
 }
 
 func (t *textHandler) handleText(message string) (string, error) {
