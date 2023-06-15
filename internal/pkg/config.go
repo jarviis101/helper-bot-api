@@ -30,10 +30,7 @@ func ResolveConfig() (*AppConfig, error) {
 		return config, nil
 	}
 
-	err := godotenv.Load(".env")
-	if err != nil {
-		return nil, err
-	}
+	godotenv.Load(".env")
 
 	content, err := os.ReadFile(path)
 	if err != nil {
