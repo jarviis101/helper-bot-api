@@ -1,4 +1,4 @@
 telegram:
-  token: "6161208907:AAFPg5vchq52ySjfn0etSvjWyU-Ji4ZjT6w"
+  token: ${TELEGRAM_BOT_TOKEN}
 openai:
-  token: "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"
+  token: ${OPENAI_TOKEN}
