@@ -40,10 +40,7 @@ func (h *handler) handleCommand(update tgbotapi.Update) tgbotapi.MessageConfig {
 }
 
 func (h *handler) handleTextMessage(update tgbotapi.Update) tgbotapi.MessageConfig {
-	responseModel, err := h.textHandler.Handle(update)
-	if err != nil {
-		return tgbotapi.NewMessage(update.Message.Chat.ID, err.Error())
-	}
+	responseModel := h.textHandler.Handle(update)
 
 	return responseModel.Msg
 }

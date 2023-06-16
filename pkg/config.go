@@ -1,9 +1,9 @@
 package pkg
 
 import (
-	"fmt"
 	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v2"
+	"log"
 	"os"
 )
 
@@ -33,7 +33,7 @@ func ResolveConfig() (*AppConfig, error) {
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Printf("Error: %s\n", err.Error())
 	}
 
 	content, err := os.ReadFile(path)

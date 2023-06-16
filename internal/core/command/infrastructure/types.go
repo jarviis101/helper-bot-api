@@ -28,5 +28,5 @@ func TryFrom(rawCommand string) (*Command, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("unknown command: %s", rawCommand)
+	return nil, fmt.Errorf("Unknown command: %s", rawCommand)
 }

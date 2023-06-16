@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	maintenance = false
+	Maintenance = false
 	timeout     = 60
 )
 
@@ -52,7 +52,7 @@ func (app *application) Run() {
 }
 
 func (app *application) sendMessage(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig) {
-	if maintenance {
+	if Maintenance {
 		msg.Text = "Bot in maintenance mode"
 	}
 	if msg.Text == "" {
@@ -60,12 +60,13 @@ func (app *application) sendMessage(bot *tgbotapi.BotAPI, msg tgbotapi.MessageCo
 	}
 
 	if _, err := bot.Send(msg); err != nil {
-		log.Println(err.Error())
+		log.Printf("Error: %s\n", err.Error())
 	}
 }
 
 func (app *application) resolveCommandStrategyResolver() service.CommandStrategyResolver {
 	startHandler := strategy.CreateStartHandler()
 	donateHandler := strategy.CreateDonateHandler()
+
 	return service.CreateCommandStrategyResolver([]strategy.CommandHandler{startHandler, donateHandler})
 }

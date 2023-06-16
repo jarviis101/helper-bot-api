@@ -17,5 +17,8 @@ func (s *startHandler) Support(supportCommand *infrastructure.Command) bool {
 }
 
 func (s *startHandler) Handle(update tgbotapi.Update) tgbotapi.MessageConfig {
-	return tgbotapi.NewMessage(update.Message.Chat.ID, "Привет, можешь задать мне любой вопрос :)")
+	return tgbotapi.NewMessage(
+		update.Message.Chat.ID,
+		"Привет, можешь задать мне любой вопрос :)",
+	)
 }

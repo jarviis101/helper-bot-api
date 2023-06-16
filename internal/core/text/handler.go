@@ -2,14 +2,14 @@ package text
 
 import (
 	"context"
-	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sashabaranov/go-openai"
 	"helper_openai_bot/internal/model"
+	"log"
 )
 
 type TextHandler interface {
-	Handle(update tgbotapi.Update) (*model.TextResponse, error)
+	Handle(update tgbotapi.Update) *model.TextResponse
 }
 
 type textHandler struct {
@@ -20,17 +20,15 @@ func CreateTextHandler(client *openai.Client) TextHandler {
 	return &textHandler{client}
 }
 
-func (t *textHandler) Handle(update tgbotapi.Update) (*model.TextResponse, error) {
-	responseMessage, err := t.handleText(update.Message.Text)
-	if err != nil {
-		return nil, err
-	}
+func (t *textHandler) Handle(update tgbotapi.Update) *model.TextResponse {
+	responseMessage := make(chan string)
+	go t.handleText(update.Message.Text, responseMessage)
 
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, responseMessage)
-	return &model.TextResponse{Msg: msg}, nil
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, <-responseMessage)
+	return &model.TextResponse{Msg: msg}
 }
 
-func (t *textHandler) handleText(message string) (string, error) {
+func (t *textHandler) handleText(message string, responseMessage chan string) {
 	resp, err := t.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -44,9 +42,9 @@ func (t *textHandler) handleText(message string) (string, error) {
 		},
 	)
 	if err != nil {
-		fmt.Printf("ChatCompletion error: %v\n", err)
-		return "", err
+		log.Printf("Error: %s\n", err.Error())
+		responseMessage <- ""
 	}
 
-	return resp.Choices[0].Message.Content, nil
+	responseMessage <- resp.Choices[0].Message.Content
 }
