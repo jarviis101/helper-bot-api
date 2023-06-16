@@ -2,9 +2,7 @@ package core
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/sashabaranov/go-openai"
 	"helper_openai_bot/internal/core/command"
-	"helper_openai_bot/internal/core/command/service"
 	"helper_openai_bot/internal/core/text"
 )
 
@@ -13,20 +11,14 @@ type Handler interface {
 }
 
 type handler struct {
-	commandStrategyResolver service.CommandStrategyResolver
-	commandResolver         service.CommandResolver
-	openAIClient            *openai.Client
+	commandHandler command.CommandHandler
+	textHandler    text.TextHandler
 }
 
-func CreateHandler(
-	commandStrategyResolver service.CommandStrategyResolver,
-	commandResolver service.CommandResolver,
-	openAIClient *openai.Client,
-) Handler {
+func CreateHandler(commandHandler command.CommandHandler, textHandler text.TextHandler) Handler {
 	return &handler{
-		commandStrategyResolver,
-		commandResolver,
-		openAIClient,
+		commandHandler,
+		textHandler,
 	}
 }
 
@@ -39,8 +31,7 @@ func (h *handler) Handle(update tgbotapi.Update) tgbotapi.MessageConfig {
 }
 
 func (h *handler) handleCommand(update tgbotapi.Update) tgbotapi.MessageConfig {
-	commandHandler := command.CreateCommandHandler(h.commandResolver, h.commandStrategyResolver)
-	commandModel, err := commandHandler.Handle(update)
+	commandModel, err := h.commandHandler.Handle(update)
 	if err != nil {
 		return tgbotapi.NewMessage(update.Message.Chat.ID, err.Error())
 	}
@@ -49,8 +40,7 @@ func (h *handler) handleCommand(update tgbotapi.Update) tgbotapi.MessageConfig {
 }
 
 func (h *handler) handleTextMessage(update tgbotapi.Update) tgbotapi.MessageConfig {
-	textHandler := text.CreateTextHandler(h.openAIClient)
-	responseModel, err := textHandler.Handle(update)
+	responseModel, err := h.textHandler.Handle(update)
 	if err != nil {
 		return tgbotapi.NewMessage(update.Message.Chat.ID, err.Error())
 	}
