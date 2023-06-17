@@ -44,6 +44,7 @@ func (t *textHandler) handleText(message string, responseMessage chan string) {
 	if err != nil {
 		log.Printf("Error: %s\n", err.Error())
 		responseMessage <- ""
+		return
 	}
 
 	responseMessage <- resp.Choices[0].Message.Content
