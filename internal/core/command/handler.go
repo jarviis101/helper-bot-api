@@ -15,7 +15,10 @@ type handler struct {
 	strategyResolver service.CommandStrategyResolver
 }
 
-func CreateCommandHandler(commandResolver service.CommandResolver, strategyResolver service.CommandStrategyResolver) CommandHandler {
+func CreateCommandHandler(
+	commandResolver service.CommandResolver,
+	strategyResolver service.CommandStrategyResolver,
+) CommandHandler {
 	return &handler{
 		commandResolver,
 		strategyResolver,
