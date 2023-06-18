@@ -8,6 +8,6 @@ import (
 type (
 	CommandHandler interface {
 		Support(supportCommand *infrastructure.Command) bool
-		Handle(update tgbotapi.Update) tgbotapi.MessageConfig
+		Handle(update tgbotapi.Update)
 	}
 )

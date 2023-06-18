@@ -6,21 +6,23 @@ import (
 	"log"
 )
 
+const maintenance = false
+
 func main() {
-	config, err := pkg.ResolveConfig()
+	config, err := pkg.CreateConfig()
 	if err != nil {
 		log.Printf("Error: %s\n", err.Error())
 		return
 	}
 
-	bot, err := pkg.ResolveBot(config.Telegram)
+	bot, err := pkg.CreateBot(config.Telegram, maintenance)
 	if err != nil {
 		log.Printf("Error: %s\n", err.Error())
 		return
 	}
 
-	client := pkg.ResolveClient(config.OpenAI)
+	client := pkg.CreateClient(config.OpenAI)
 
-	application := app.CreateApplication(bot, client)
+	application := app.CreateApplication(bot, client, maintenance)
 	application.Run()
 }

@@ -12,7 +12,8 @@ const (
 )
 
 type Telegram struct {
-	Token string `yaml:"token"`
+	Token       string `yaml:"token"`
+	Maintenance bool   `yaml:"maintenance"`
 }
 
 type OpenAI struct {
@@ -24,13 +25,7 @@ type AppConfig struct {
 	OpenAI
 }
 
-var config *AppConfig
-
-func ResolveConfig() (*AppConfig, error) {
-	if config != nil {
-		return config, nil
-	}
-
+func CreateConfig() (*AppConfig, error) {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Printf("Error: %s\n", err.Error())

@@ -3,11 +3,11 @@ package command
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"helper_openai_bot/internal/core/command/service"
-	"helper_openai_bot/internal/model"
+	"log"
 )
 
 type CommandHandler interface {
-	Handle(update tgbotapi.Update) (*model.CommandResponse, error)
+	Handle(update tgbotapi.Update)
 }
 
 type handler struct {
@@ -25,14 +25,13 @@ func CreateCommandHandler(
 	}
 }
 
-func (h *handler) Handle(update tgbotapi.Update) (*model.CommandResponse, error) {
+func (h *handler) Handle(update tgbotapi.Update) {
 	clientCommand, err := h.commandResolver.ResolveByCommand(update.Message.Text)
 	if err != nil {
-		return nil, err
+		log.Printf("Error: %s\n", err.Error())
+		return
 	}
 	strategy := h.strategyResolver.Resolve(clientCommand)
 
-	msg := strategy.Handle(update)
-
-	return &model.CommandResponse{Msg: msg}, nil
+	strategy.Handle(update)
 }

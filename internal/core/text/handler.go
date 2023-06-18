@@ -4,28 +4,29 @@ import (
 	"context"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sashabaranov/go-openai"
-	"helper_openai_bot/internal/model"
+	"helper_openai_bot/internal/pkg"
 	"log"
 )
 
 type TextHandler interface {
-	Handle(update tgbotapi.Update) *model.TextResponse
+	Handle(update tgbotapi.Update)
 }
 
 type textHandler struct {
 	client *openai.Client
+	sender pkg.SenderInterface
 }
 
-func CreateTextHandler(client *openai.Client) TextHandler {
-	return &textHandler{client}
+func CreateTextHandler(client *openai.Client, sender pkg.SenderInterface) TextHandler {
+	return &textHandler{client, sender}
 }
 
-func (t *textHandler) Handle(update tgbotapi.Update) *model.TextResponse {
+func (t *textHandler) Handle(update tgbotapi.Update) {
 	responseMessage := make(chan string)
 	go t.handleText(update.Message.Text, responseMessage)
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, <-responseMessage)
-	return &model.TextResponse{Msg: msg}
+	t.sender.SendMessage(update, msg)
 }
 
 func (t *textHandler) handleText(message string, responseMessage chan string) {

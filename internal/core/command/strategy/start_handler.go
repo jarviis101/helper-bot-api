@@ -2,23 +2,27 @@ package strategy
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"helper_openai_bot/internal/core/command/infrastructure"
+	"helper_openai_bot/internal/pkg"
 )
 
 type startHandler struct {
+	sender    pkg.SenderInterface
+	localizer *i18n.Localizer
 }
 
-func CreateStartHandler() CommandHandler {
-	return &startHandler{}
+func CreateStartHandler(sender pkg.SenderInterface, localizer *i18n.Localizer) CommandHandler {
+	return &startHandler{sender, localizer}
 }
 
 func (s *startHandler) Support(supportCommand *infrastructure.Command) bool {
 	return *supportCommand == infrastructure.StartCommand
 }
 
-func (s *startHandler) Handle(update tgbotapi.Update) tgbotapi.MessageConfig {
-	return tgbotapi.NewMessage(
-		update.Message.Chat.ID,
-		"Привет, можешь задать мне любой вопрос :)",
-	)
+func (s *startHandler) Handle(update tgbotapi.Update) {
+	startMessage, _ := s.localizer.Localize(&i18n.LocalizeConfig{MessageID: "start_message"})
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, startMessage)
+
+	s.sender.SendMessage(update, msg)
 }

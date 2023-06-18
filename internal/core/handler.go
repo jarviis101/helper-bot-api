@@ -7,7 +7,7 @@ import (
 )
 
 type Handler interface {
-	Handle(update tgbotapi.Update) tgbotapi.MessageConfig
+	Handle(update tgbotapi.Update)
 }
 
 type handler struct {
@@ -22,25 +22,11 @@ func CreateHandler(commandHandler command.CommandHandler, textHandler text.TextH
 	}
 }
 
-func (h *handler) Handle(update tgbotapi.Update) tgbotapi.MessageConfig {
+func (h *handler) Handle(update tgbotapi.Update) {
 	if update.Message.IsCommand() {
-		return h.handleCommand(update)
+		h.commandHandler.Handle(update)
+		return
 	}
 
-	return h.handleTextMessage(update)
-}
-
-func (h *handler) handleCommand(update tgbotapi.Update) tgbotapi.MessageConfig {
-	commandModel, err := h.commandHandler.Handle(update)
-	if err != nil {
-		return tgbotapi.NewMessage(update.Message.Chat.ID, err.Error())
-	}
-
-	return commandModel.Msg
-}
-
-func (h *handler) handleTextMessage(update tgbotapi.Update) tgbotapi.MessageConfig {
-	responseModel := h.textHandler.Handle(update)
-
-	return responseModel.Msg
+	h.textHandler.Handle(update)
 }

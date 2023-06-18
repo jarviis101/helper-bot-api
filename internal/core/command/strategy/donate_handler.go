@@ -2,23 +2,27 @@ package strategy
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"helper_openai_bot/internal/core/command/infrastructure"
+	"helper_openai_bot/internal/pkg"
 )
 
 type donateHandler struct {
+	sender    pkg.SenderInterface
+	localizer *i18n.Localizer
 }
 
-func CreateDonateHandler() CommandHandler {
-	return &donateHandler{}
+func CreateDonateHandler(sender pkg.SenderInterface, localizer *i18n.Localizer) CommandHandler {
+	return &donateHandler{sender, localizer}
 }
 
 func (d donateHandler) Support(supportCommand *infrastructure.Command) bool {
 	return *supportCommand == infrastructure.DonateCommand
 }
 
-func (d donateHandler) Handle(update tgbotapi.Update) tgbotapi.MessageConfig {
-	return tgbotapi.NewMessage(
-		update.Message.Chat.ID,
-		"Hi, You can support this bot - 5168752080882056 :)",
-	)
+func (d donateHandler) Handle(update tgbotapi.Update) {
+	startMessage, _ := d.localizer.Localize(&i18n.LocalizeConfig{MessageID: "support_message"})
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, startMessage)
+
+	d.sender.SendMessage(update, msg)
 }

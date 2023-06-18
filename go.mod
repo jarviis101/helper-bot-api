@@ -8,4 +8,8 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require github.com/joho/godotenv v1.5.1 // indirect
+require (
+	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/nicksnyder/go-i18n/v2 v2.2.1 // indirect
+	golang.org/x/text v0.4.0 // indirect
+)

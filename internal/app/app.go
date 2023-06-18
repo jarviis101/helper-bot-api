@@ -2,18 +2,18 @@ package app
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/sashabaranov/go-openai"
 	"helper_openai_bot/internal/core"
 	"helper_openai_bot/internal/core/command"
 	"helper_openai_bot/internal/core/command/service"
 	"helper_openai_bot/internal/core/command/strategy"
 	"helper_openai_bot/internal/core/text"
-	"log"
+	"helper_openai_bot/internal/pkg"
 )
 
 const (
-	Maintenance = false
-	timeout     = 60
+	timeout = 60
 )
 
 type Application interface {
@@ -21,23 +21,27 @@ type Application interface {
 }
 
 type application struct {
-	bot    *tgbotapi.BotAPI
-	client *openai.Client
+	bot         *tgbotapi.BotAPI
+	client      *openai.Client
+	Maintenance bool
 }
 
-func CreateApplication(bot *tgbotapi.BotAPI, client *openai.Client) Application {
-	return &application{bot, client}
+func CreateApplication(bot *tgbotapi.BotAPI, client *openai.Client, maintenance bool) Application {
+	return &application{bot, client, maintenance}
 }
 
 func (app *application) Run() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = timeout
 
-	commandStrategyResolver := app.resolveCommandStrategyResolver()
+	localizer := pkg.CreateLocalizer()
+	sender := pkg.CreateSender(app.bot, localizer, app.Maintenance)
+
+	commandStrategyResolver := app.resolveCommandStrategyResolver(localizer, sender)
 	commandResolver := service.CreateCommandResolver()
 
 	commandHandler := command.CreateCommandHandler(commandResolver, commandStrategyResolver)
-	textHandler := text.CreateTextHandler(app.client)
+	textHandler := text.CreateTextHandler(app.client, sender)
 
 	handler := core.CreateHandler(commandHandler, textHandler)
 
@@ -46,27 +50,16 @@ func (app *application) Run() {
 			continue
 		}
 
-		msg := handler.Handle(update)
-		app.sendMessage(app.bot, msg)
+		handler.Handle(update)
 	}
 }
 
-func (app *application) sendMessage(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig) {
-	if Maintenance {
-		msg.Text = "Bot in maintenance mode"
-	}
-	if msg.Text == "" {
-		msg.Text = "Что то пошло не так, ознакомься со списком возможностей бота :)"
-	}
-
-	if _, err := bot.Send(msg); err != nil {
-		log.Printf("Error: %s\n", err.Error())
-	}
-}
-
-func (app *application) resolveCommandStrategyResolver() service.CommandStrategyResolver {
-	startHandler := strategy.CreateStartHandler()
-	donateHandler := strategy.CreateDonateHandler()
+func (app *application) resolveCommandStrategyResolver(
+	localizer *i18n.Localizer,
+	sender pkg.SenderInterface,
+) service.CommandStrategyResolver {
+	startHandler := strategy.CreateStartHandler(sender, localizer)
+	donateHandler := strategy.CreateDonateHandler(sender, localizer)
 
 	return service.CreateCommandStrategyResolver([]strategy.CommandHandler{startHandler, donateHandler})
 }
