@@ -32,4 +32,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Run golangci lint"
-        run: make run-lint
+        run: golangci-lint run ./... -v
