@@ -1,4 +1,4 @@
-package service
+package resolver
 
 import "helper_openai_bot/internal/core/command/infrastructure"
 

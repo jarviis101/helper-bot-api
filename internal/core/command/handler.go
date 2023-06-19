@@ -2,23 +2,23 @@ package command
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"helper_openai_bot/internal/core/command/service"
+	"helper_openai_bot/internal/core/command/resolver"
 	"log"
 )
 
-type CommandHandler interface {
+type Handler interface {
 	Handle(update tgbotapi.Update)
 }
 
 type handler struct {
-	commandResolver  service.CommandResolver
-	strategyResolver service.CommandStrategyResolver
+	commandResolver  resolver.CommandResolver
+	strategyResolver resolver.CommandStrategyResolver
 }
 
 func CreateCommandHandler(
-	commandResolver service.CommandResolver,
-	strategyResolver service.CommandStrategyResolver,
-) CommandHandler {
+	commandResolver resolver.CommandResolver,
+	strategyResolver resolver.CommandStrategyResolver,
+) Handler {
 	return &handler{
 		commandResolver,
 		strategyResolver,

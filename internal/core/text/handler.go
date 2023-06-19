@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-type TextHandler interface {
+type Handler interface {
 	Handle(update tgbotapi.Update)
 }
 
@@ -17,7 +17,7 @@ type textHandler struct {
 	sender pkg.SenderInterface
 }
 
-func CreateTextHandler(client *openai.Client, sender pkg.SenderInterface) TextHandler {
+func CreateTextHandler(client *openai.Client, sender pkg.SenderInterface) Handler {
 	return &textHandler{client, sender}
 }
 

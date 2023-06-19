@@ -6,7 +6,7 @@ import (
 	"github.com/sashabaranov/go-openai"
 	"helper_openai_bot/internal/core"
 	"helper_openai_bot/internal/core/command"
-	"helper_openai_bot/internal/core/command/service"
+	"helper_openai_bot/internal/core/command/resolver"
 	"helper_openai_bot/internal/core/command/strategy"
 	"helper_openai_bot/internal/core/text"
 	"helper_openai_bot/internal/pkg"
@@ -38,7 +38,7 @@ func (app *application) Run() {
 	sender := pkg.CreateSender(app.bot, localizer, app.Maintenance)
 
 	commandStrategyResolver := app.resolveCommandStrategyResolver(localizer, sender)
-	commandResolver := service.CreateCommandResolver()
+	commandResolver := resolver.CreateCommandResolver()
 
 	commandHandler := command.CreateCommandHandler(commandResolver, commandStrategyResolver)
 	textHandler := text.CreateTextHandler(app.client, sender)
@@ -57,9 +57,9 @@ func (app *application) Run() {
 func (app *application) resolveCommandStrategyResolver(
 	localizer *i18n.Localizer,
 	sender pkg.SenderInterface,
-) service.CommandStrategyResolver {
+) resolver.CommandStrategyResolver {
 	startHandler := strategy.CreateStartHandler(sender, localizer)
 	donateHandler := strategy.CreateDonateHandler(sender, localizer)
 
-	return service.CreateCommandStrategyResolver([]strategy.CommandHandler{startHandler, donateHandler})
+	return resolver.CreateCommandStrategyResolver([]strategy.CommandHandler{startHandler, donateHandler})
 }

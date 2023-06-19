@@ -11,11 +11,11 @@ type Handler interface {
 }
 
 type handler struct {
-	commandHandler command.CommandHandler
-	textHandler    text.TextHandler
+	commandHandler command.Handler
+	textHandler    text.Handler
 }
 
-func CreateHandler(commandHandler command.CommandHandler, textHandler text.TextHandler) Handler {
+func CreateHandler(commandHandler command.Handler, textHandler text.Handler) Handler {
 	return &handler{
 		commandHandler,
 		textHandler,
