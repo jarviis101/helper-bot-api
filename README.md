@@ -1,4 +1,4 @@
-OpenAi Helper Bot Backend
+Helper Bot Backend
 =====
 
 ## Deployment & Run application
