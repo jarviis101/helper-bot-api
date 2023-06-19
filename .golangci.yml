@@ -4,8 +4,11 @@ run:
 linters:
   enable:
     - lll
+    - maligned
 
 linters-settings:
+  maligned:
+    suggest-new: true
   lll:
     line-length: 120
     tab-width: 4
