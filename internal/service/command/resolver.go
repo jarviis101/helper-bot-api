@@ -1,15 +1,11 @@
-package resolver
+package command
 
-import "helper_openai_bot/internal/core/command/infrastructure"
-
-type CommandResolver interface {
-	ResolveByCommand(rawCommand string) (*infrastructure.Command, error)
-}
+import "helper_openai_bot/internal/service/command/infrastructure"
 
 type commandResolver struct {
 }
 
-func CreateCommandResolver() CommandResolver {
+func CreateCommandResolver() infrastructure.CommandResolver {
 	return &commandResolver{}
 }
 

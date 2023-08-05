@@ -3,8 +3,8 @@ package strategy
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"helper_openai_bot/internal/core/command/infrastructure"
 	"helper_openai_bot/internal/pkg"
+	"helper_openai_bot/internal/service/command/infrastructure"
 )
 
 type startHandler struct {
@@ -12,7 +12,7 @@ type startHandler struct {
 	localizer *i18n.Localizer
 }
 
-func CreateStartHandler(sender pkg.SenderInterface, localizer *i18n.Localizer) CommandHandler {
+func CreateStartHandler(sender pkg.SenderInterface, localizer *i18n.Localizer) infrastructure.CommandHandler {
 	return &startHandler{sender, localizer}
 }
 
